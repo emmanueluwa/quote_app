@@ -5,8 +5,8 @@ from .models import Quote
 class QuoteSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=True)
     address = serializers.CharField(required=True)
-    created_at = serializers.DateTimeField(required=False)
-    updated_at = serializers.DateTimeField(required=False)
+    created_at = serializers.DateTimeField(required=False, input_formats=['d/m/y'])
+    updated_at = serializers.DateTimeField(required=False, input_formats=['d/m/y'])
 
     class Meta:
         model = Quote
