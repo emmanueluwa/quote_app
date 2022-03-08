@@ -42,3 +42,17 @@ class QuoteTests(TestCase):
         self.assertEqual(quote.address, json_response[0]["address"])
         self.assertEqual(quote.description, json_response[0]["description"])
 
+    def test_retrieve_expense(self):
+        quote = QuoteFactory()
+        #to retreive, update or delete an id is needed
+        url = reverse("quote_api:quote-retrieve-update-destroy", args=[quote.id])
+
+        response = self.client.get(url, format="json")
+        json_response = response.json()
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(quote.name,json_response["name"])
+        self.assertEqual(quote.address, json_response["address"])
+        self.assertEqual(quote.description, json_response["description"])
+
+
