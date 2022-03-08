@@ -67,3 +67,40 @@ class QuoteTests(TestCase):
         #assert there is no content and that record no longer exists
         self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
         self.assertFalse(Quote.objects.filter(id=quote.id))
+
+    def test_update_quote(self):
+        #random record from factory
+        quote = QuoteFactory()
+
+        url = reverse("quote_api:quote-retrieve-update-destroy", args=[quote.id])
+        info = {
+            "name": "OhSo",
+            "address": "GreatnessLane",
+        }
+
+        response = self.client.put(url, info, format="json")
+
+        #db fetch updated info
+        updated_quote = Quote.objects.get(id=quote.id)
+        
+        #checking updated info matches info added
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(updated_quote.name, info["name"])
+        self.assertEqual(updated_quote.address, info["address"])
+    
+    def test_unsuccessful_quote_update(self):
+        quote = QuoteFactory()
+
+        url = reverse("quote_api:quote-retrieve-update-destroy", args=[quote.id])
+        info = {
+            
+        }
+
+        response = self.client.put(url, info, format="json")
+        json_response = response.json()
+
+        self.assertEqual(status.HTTP_400_BAD_REQUEST, response.status_code)
+        #response from serializer when required fields are not filled
+        self.assertEqual(json_response["name"], ["This field is required."])
+        self.assertEqual(json_response["address"], ["This field is required."])
+
