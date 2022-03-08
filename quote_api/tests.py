@@ -2,6 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status 
+from .models import Quote
 
 from .factories import QuoteFactory
 
@@ -55,4 +56,14 @@ class QuoteTests(TestCase):
         self.assertEqual(quote.address, json_response["address"])
         self.assertEqual(quote.description, json_response["description"])
 
+    def test_delete_quote(self):
+        quote = QuoteFactory()
 
+        url = reverse("quote_api:quote-retrieve-update-destroy", args=[quote.id])
+
+        #delete whatever is in the url
+        response = self.client.delete(url, format="json")
+
+        #assert there is no content and that record no longer exists
+        self.assertEqual(status.HTTP_204_NO_CONTENT, response.status_code)
+        self.assertFalse(Quote.objects.filter(id=quote.id))

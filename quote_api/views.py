@@ -27,3 +27,7 @@ class QuoteRetrieveUpdateDestroyView(APIView):
         serializer = QuoteSerializer(quote, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request, pk):
+        quote = get_object_or_404(Quote, id=pk)
+        quote.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
