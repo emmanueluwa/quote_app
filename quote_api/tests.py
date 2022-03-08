@@ -3,6 +3,7 @@ from rest_framework.test import APIClient
 from django.urls import reverse
 from rest_framework import status 
 from .models import Quote
+import jwt
 
 from .factories import QuoteFactory
 
@@ -104,3 +105,24 @@ class QuoteTests(TestCase):
         self.assertEqual(json_response["name"], ["This field is required."])
         self.assertEqual(json_response["address"], ["This field is required."])
 
+
+class RegisterTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("quote_api:registration-create")
+
+    def test_registration(self):
+        info = {
+            "email": "wisest@mail.com",
+            "password": "pass123",
+            "username": "wise1"
+        }
+        response = self.client.post(self.url, info, format="json")
+        json_response = response.json()
+
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(json_response["email"], info["email"])
+        self.assertEqual(json_response["username"], info["username"])
+        # confirming password is not sent back w response
+        with self.assertRaises(KeyError):
+            json_response["password"]
