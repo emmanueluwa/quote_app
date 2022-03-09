@@ -4,8 +4,9 @@ from django.urls import reverse
 from rest_framework import status 
 from .models import Quote
 import jwt
+from django.conf import settings
 
-from .factories import QuoteFactory
+from .factories import QuoteFactory, UserFactory
 
 class QuoteTests(TestCase):
     def setUp(self):
@@ -126,3 +127,27 @@ class RegisterTest(TestCase):
         # confirming password is not sent back w response
         with self.assertRaises(KeyError):
             json_response["password"]
+
+
+class SessionCreateTest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.url = reverse("quote_api:session-create")
+        #password stated here incase it is changed in factories
+        self.user = UserFactory(password='password123')
+
+    def test_create_session(self):
+        #password above is hashed so we state it unhashed below
+        info = {"username": self.user.username, "password": "password123"}
+
+        response = self.client.post(self.url, info, format="json")
+
+        #decode the data using the algorithm and secret key
+        decoded_token = jwt.decode(
+            response.data["jwt"], settings.SECRET_KEY, algorithms=["HS256"]
+        )
+
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertTrue("jwt" in response.data)
+        self.assertEqual(self.user.id, decoded_token["user_id"])
+
