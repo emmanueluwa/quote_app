@@ -11,6 +11,9 @@ from .factories import QuoteFactory, UserFactory
 class QuoteTests(TestCase):
     def setUp(self):
         self.client = APIClient()
+        self.user = UserFactory(password='password123')
+        info = {"username": self.user.username, "password": "password123"}
+        self.client.post(reverse("quote_api:session-create"), info, format="json")
 
     def test_create_quote(self):
         url = reverse("quote_api:quote-list-create")

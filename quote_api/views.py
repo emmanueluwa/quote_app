@@ -13,10 +13,16 @@ class QuoteListCreateView(ListCreateAPIView):
     #all generics needs is serializer class and query set
     serializer_class = QuoteSerializer
     queryset = Quote.objects.all()
+    #protecting ability to list/create, inherititing from authentication
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class QuoteRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
     serializer_class = QuoteSerializer
     queryset = Quote.objects.all()
+    #protecting ability to retrieve update/destroy, inherititing from authentication
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
 class RegistrationCreateView(CreateAPIView):
     serializer_class = UserSerializer
