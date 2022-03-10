@@ -171,3 +171,19 @@ class SessionRetrieveDestroyTest(TestCase):
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(response.data["data"]["id"], self.user.id)
         self.assertEqual(response.data["data"]["email"], self.user.email)
+
+    def test_delete_session(self):
+        # nonehashed verion of password
+        info = {"username": self.user.username, "password": "password123"}
+        #create a session
+        self.client.post(reverse("quote_api:session-create"), info, format="json")
+        #delete a session
+        self.client.delete(
+            reverse("quote_api:session-retrieve-destroy"), format="json"
+        )
+        #attempt retrieving the deleted session
+        response = self.client.get(
+            reverse("quote_api:session-retrieve-destroy"), format="json"
+        )
+
+        self.assertEqual(status.HTTP_403_FORBIDDEN, response.status_code)
