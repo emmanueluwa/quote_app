@@ -6,7 +6,8 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.views import APIView
 from rest_framework import exceptions, status
 from rest_framework.response import Response
-from quote_api.authentication import generate_access_token
+from quote_api.authentication import generate_access_token, JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class QuoteListCreateView(ListCreateAPIView):
     #all generics needs is serializer class and query set
@@ -41,3 +42,14 @@ class SessionCreateView(APIView):
         response.data = {"jwt": token}
 
         return response
+
+class SessionRetrieveDestroyView(APIView):
+    #we need an authentication class and permission class
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        #the user attached jwt authentication, is attached to the request. serializer cleans data
+        serializer = UserSerializer(request.user)
+        return Response({"data": serializer.data})
+
